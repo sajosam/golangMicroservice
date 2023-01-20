@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"golang/order/orderdb"
+	"example.com/order/orderdb"
 
 	"github.com/gorilla/mux"
 )

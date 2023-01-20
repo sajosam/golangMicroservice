@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"golang/product/productdb"
+	"example.com/product/productdb"
 
 	"github.com/gorilla/mux"
 )
