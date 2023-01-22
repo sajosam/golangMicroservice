@@ -16,6 +16,7 @@ func main() {
 	router.HandleFunc("/health", userdb.HealthCheck).Methods("GET")
 	router.HandleFunc("/user", usrhandlerobj.GetUser).Methods("GET")
 	router.HandleFunc("/adduser", usrhandlerobj.AddUser).Methods("POST")
+	router.HandleFunc("/delUser/{id}", usrhandlerobj.DelUser).Methods("DELETE")
 	router.HandleFunc("/ordHome", OrdHome).Methods("GET")
 	router.HandleFunc("/invHome", InvHome).Methods("GET")
 	router.HandleFunc("/proHome", ProHome).Methods("GET")
@@ -23,6 +24,7 @@ func main() {
 	router.HandleFunc("/delInv/{id}", DelInv).Methods("DELETE")
 	router.HandleFunc("/addInv", addInv).Methods("POST")
 	router.HandleFunc("/addPro", addPro).Methods("POST")
+	router.HandleFunc("/addOrd/{id}", addOrd).Methods("POST")
 
 
 	http.Handle("/", router)
@@ -102,4 +104,24 @@ func addPro(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	w.Write([]byte(resp.Body()))
+}
+
+func addOrd(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	client := resty.New()
+	// check the product is availabale in inventory
+	resp, _ := client.R().Get("http://localhost:8200/singleinventory/"+vars["id"])
+
+	// check the product is availabale in resp
+	if resp.StatusCode() == 200 {
+		resp, err := client.R().Post("http://localhost:8300/addorder")
+		// print the values in the response
+		if err != nil {
+			panic(err)
+		}
+		w.Write([]byte(resp.Body()))
+	} else {
+		w.Write([]byte("Product is not available in inventory"))
+	}
+
 }

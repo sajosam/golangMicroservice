@@ -30,7 +30,7 @@ func (proHandler *ProHandler) Connection(host,user,password,dbname,port string) 
 	}
 	fmt.Println("Connection Opened to Database")
 
-	proHandler.DB.AutoMigrate(&ProductDB{})
+	proHandler.DB.AutoMigrate(ProductDB{})
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {

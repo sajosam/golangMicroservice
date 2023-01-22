@@ -31,7 +31,7 @@ func (invhandler *InvHandler) Connection(host,user,password,dbname,port string) 
 	}
 	fmt.Println("Connection Opened to Database")
 
-	invhandler.DB.AutoMigrate(&Inventory{})
+	invhandler.DB.AutoMigrate(Inventory{})
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -61,4 +61,13 @@ func (invhandler *InvHandler) DelInventory(w http.ResponseWriter, r *http.Reques
 	params := mux.Vars(r)
 	invhandler.DB.Delete(&inventory, params["id"])
 	json.NewEncoder(w).Encode(&inventory)
+}
+
+func (invhandler *InvHandler) GetIndInventory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var inventory Inventory
+	params := mux.Vars(r)
+	invhandler.DB.Find(&inventory, params["id"])
+	json.NewEncoder(w).Encode(&inventory)
+	
 }

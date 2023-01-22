@@ -53,3 +53,12 @@ func (usrhandler *UsrHandler) AddUser(w http.ResponseWriter, r *http.Request) {
 	usrhandler.DB.Create(&User)
 	json.NewEncoder(w).Encode(&User)
 }
+
+func (usrhandler *UsrHandler) DelUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var User User
+	json.NewDecoder(r.Body).Decode(&User)
+	usrhandler.DB.Delete(&User)
+	json.NewEncoder(w).Encode(&User)
+	
+}

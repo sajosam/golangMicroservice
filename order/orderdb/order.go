@@ -31,7 +31,7 @@ func (ordhandler *OrdHandler) Connection(host,user,password,dbname,port string) 
 	}
 	fmt.Println("Connection Opened to Database")
 
-	ordhandler.DB.AutoMigrate(&Order{})
+	ordhandler.DB.AutoMigrate(Order{})
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
