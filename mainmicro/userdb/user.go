@@ -23,14 +23,16 @@ type UsrHandler struct {
 func (ordhandler *UsrHandler) Connection(host,user,password,dbname,port string) {
 	var err error
 
-	dsn:="host=host.docker.internal user="+user+" password="+password+" dbname="+dbname+" port="+port+" sslmode=disable"
+	dsn:="host="+host+" user="+user+" password="+password+" dbname="+dbname+" port="+port+" sslmode=disable"
 	ordhandler.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 	fmt.Println("Connection Opened to Database")
 
-	ordhandler.DB.AutoMigrate(User{})
+	// ordhandler.DB.AutoMigrate(User{})
+	ordhandler.DB.AutoMigrate(&User{})
+
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {

@@ -3,6 +3,7 @@ package orderdb
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"gorm.io/driver/postgres"
@@ -31,7 +32,9 @@ func (ordhandler *OrdHandler) Connection(host,user,password,dbname,port string) 
 	}
 	fmt.Println("Connection Opened to Database")
 
-	ordhandler.DB.AutoMigrate(Order{})
+	// ordhandler.DB.AutoMigrate(Order{})
+	ordhandler.DB.AutoMigrate(&Order{})
+
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +53,9 @@ func (ordhandler *OrdHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 func (ordhandler *OrdHandler) AddOrder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var Order Order
-	json.NewDecoder(r.Body).Decode(&Order)
+	d,_:=ioutil.ReadAll(r.Body)
+	// json.NewDecoder(r.Body).Decode(&Order)
+	json.Unmarshal(d,&Order)
 	ordhandler.DB.Create(&Order)
 	json.NewEncoder(w).Encode(&Order)
 }

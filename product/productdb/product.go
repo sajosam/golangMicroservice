@@ -3,6 +3,7 @@ package productdb
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"gorm.io/driver/postgres"
@@ -30,7 +31,9 @@ func (proHandler *ProHandler) Connection(host,user,password,dbname,port string) 
 	}
 	fmt.Println("Connection Opened to Database")
 
-	proHandler.DB.AutoMigrate(ProductDB{})
+	// proHandler.DB.AutoMigrate(ProductDB{})
+	proHandler.DB.AutoMigrate(&ProductDB{})
+
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +59,9 @@ func (proHandler *ProHandler) GetIndProduct(w http.ResponseWriter, r *http.Reque
 func (proHandler *ProHandler) AddProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var product ProductDB
-	json.NewDecoder(r.Body).Decode(&product)
+	d,_:=ioutil.ReadAll(r.Body)
+	// json.NewDecoder(r.Body).Decode(&product)
+	json.Unmarshal(d,&product)
 	proHandler.DB.Create(&product)
 	json.NewEncoder(w).Encode(&product)
 }

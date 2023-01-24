@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	"example.com/mainmicro/userdb"
@@ -9,9 +10,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type Inventory struct {
+	Id int `json:"ID"`
+	ProductName string `json:"product_name"`
+	ProductQuantity int `json:"product_quantity"`
+}
+
 func main() {
 	var usrhandlerobj userdb.UsrHandler
-	usrhandlerobj.Connection("host.docker.internal","postgres","root","forgolang","5433")
+	// usrhandlerobj.Connection("host.docker.internal","postgres","root","forgolang","5433")
+	usrhandlerobj.Connection("localhost","postgres","root","forgolang","5433")
+
 	router:=mux.NewRouter()
 	router.HandleFunc("/health", userdb.HealthCheck).Methods("GET")
 	router.HandleFunc("/user", usrhandlerobj.GetUser).Methods("GET")
@@ -88,17 +97,30 @@ func DelInv(w http.ResponseWriter, r *http.Request) {
 
 func addInv(w http.ResponseWriter, r *http.Request) {
 	client := resty.New()
-	resp, err := client.R().Post("http://localhost:8200/addinventory")
+	w.Header().Set("Content-Type", "application/json")
+	// var inventory Inventory
+	d,_:=ioutil.ReadAll(r.Body)
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(string(d)).
+		Post("http://localhost:8200/addinventory")
 	// print the values in the response
 	if err != nil {
 		panic(err)
 	}
 	w.Write([]byte(resp.Body()))
+
+
 }
 
 func addPro(w http.ResponseWriter, r *http.Request) {
 	client := resty.New()
-	resp, err := client.R().Post("http://localhost:8100/addproduct")
+	d,_:=ioutil.ReadAll(r.Body)
+	// resp, err := client.R().Post("http://localhost:8100/addproduct")
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(string(d)).
+		Post("http://localhost:8100/addproduct")
 	// print the values in the response
 	if err != nil {
 		panic(err)
@@ -109,6 +131,7 @@ func addPro(w http.ResponseWriter, r *http.Request) {
 func addOrd(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	client := resty.New()
+	
 	// check the product is availabale in inventory
 	resp, _ := client.R().Get("http://localhost:8200/singleinventory/"+vars["id"])
 
